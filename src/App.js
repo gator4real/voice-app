@@ -7,13 +7,17 @@ import { useVoice } from "./voice";
 import axios from "axios";
 
 const App = () => {
-  console.log("app");
+  // console.log("app");
   const { transcript, resetTranscript, listening } = useSpeechRecognition({
     continuous: true,
   });
 
+  // revert to webkit for better control over mic stop and start
+
   const apiKey = "e7fd20d862337642310375d8d0fac1b6"; // add input
-  const voiceId = "21m00Tcm4TlvDq8ikWAM"; // get all and dropdown
+  const voiceId = "xSV2LpK8ApxOXFOkWpft"; // get all and dropdown
+  // trump xSV2LpK8ApxOXFOkWpft
+  // angel Ii7yjallwe990yojM3L9
   // const [voices, setVoices] = useState([]);
   const url = "https://api.elevenlabs.io";
   const [audioContext, setAudioContext] = useState(null);
@@ -33,6 +37,74 @@ const App = () => {
   // audioSource.connect(audioContext.destination);
 
   // recognition.start();
+  const profanityList = {
+    "f***": "fuck",
+    "f****": "fucks",
+    "f*****": "fucker",
+    "f******": "fucking",
+    "s***": "shit",
+    "b******": "bullshit",
+    "s*******": "shitting",
+    "a*******": "asshole",
+    "c***": "cunt",
+    "m*********": "motherfuck",
+    "m************": "motherfucking",
+    "m***********": "motherfucker",
+    "c***": "cock",
+    "c*********": "cocksucker",
+    "c**********": "cocksucking",
+    "d*********": "dicksucker",
+    "d**********": "dicksucking",
+    "b****": "bitch",
+  };
+
+  function unfilter(text) {
+    const words = text.split(" ");
+    const filteredWords = words.map((word) => {
+      if (word in profanityList) {
+        return profanityList[word];
+      } else {
+        return word;
+      }
+    });
+    return filteredWords.join(" ");
+  }
+
+  // const unfilter = (text) => {
+  //   const array = text.split(" ");
+  //   array.forEach((word, index) => {
+  //     // expand
+  //     if (word.toLowerCase() === "f***") {
+  //       array[index] = "fuck";
+  //     }
+  //   });
+  //   return array.join(" ");
+  // };
+
+  useEffect(() => {
+    const get = async () => {
+      const voices = await getVoices();
+      console.log(voices);
+    };
+    get();
+  }, []);
+
+  const getVoices = async () => {
+    try {
+      const response = await fetch(`${url}/v1/voices`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "xi-api-key": apiKey,
+        },
+      }).then((response) => response.json());
+
+      console.log(response);
+      return response;
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const getSpeech = async () => {
     try {
@@ -43,7 +115,7 @@ const App = () => {
           "xi-api-key": apiKey,
         },
         body: JSON.stringify({
-          text: transcript,
+          text: unfilter(transcript),
           voice_settings: {
             stability: 0,
             similarity_boost: 0,
@@ -113,7 +185,7 @@ const App = () => {
     if (listen) {
       console.log(listening);
       if (transcript) {
-        console.log(`transcript: ${transcript}`);
+        console.log(`transcript: ${unfilter(transcript)}`);
         const speechy = async () => {
           const speech = await getSpeech();
           console.log(speech);
@@ -154,7 +226,7 @@ const App = () => {
       <button onClick={stopListening}>Stop</button>
       <button onClick={resetTranscript}>Reset</button>
       {/* <button onClick={audioContext.resume}>Play</button> */}
-      <p>{transcript}</p>
+      <p>{unfilter(transcript)}</p>
     </div>
   ) : (
     <div>not working my friend</div>
