@@ -106,7 +106,7 @@ const App = () => {
     }
   };
 
-  const getSpeech = async () => {
+  const getSpeech = async (text) => {
     try {
       const response = await fetch(`${url}/v1/text-to-speech/${voiceId}`, {
         method: "POST",
@@ -115,7 +115,7 @@ const App = () => {
           "xi-api-key": apiKey,
         },
         body: JSON.stringify({
-          text: unfilter(transcript),
+          text: unfilter(text),
           voice_settings: {
             stability: 0,
             similarity_boost: 0,
@@ -181,17 +181,22 @@ const App = () => {
     }
   };
 
+  const [wordCount, setWordCount] = useState(0);
+  const [active, setActive] = useState(true);
+
   useEffect(() => {
     if (listen) {
       console.log(listening);
-      if (transcript) {
+      if (!active && transcript) {
+        const text = transcript;
+        // setWordCount(0);
+        resetTranscript();
         console.log(`transcript: ${unfilter(transcript)}`);
-        const speechy = async () => {
-          const speech = await getSpeech();
+        const speechy = async (text) => {
+          const speech = await getSpeech(text);
           console.log(speech);
         };
-        speechy();
-        resetTranscript();
+        speechy(text);
         // SpeechRecognition.stopListening();
       }
 
@@ -199,7 +204,46 @@ const App = () => {
         SpeechRecognition.startListening();
       }
     }
-  }, [listening]);
+  }, [active]);
+
+  // useEffect(() => {
+  //   setWordCount(wordCount + 1);
+  // }, [transcript]);
+
+  let timer;
+
+  console.log("app");
+
+  const [timeoutId, setTimeoutId] = useState(null);
+
+  useEffect(() => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      setActive(true);
+    }
+
+    setTimeoutId(
+      setTimeout(() => {
+        console.log("timeout active!");
+        setActive(false);
+      }, 800)
+    );
+  }, [transcript]);
+
+  // (function timeout() {
+  //   timer = setTimeout(() => {
+  //     setActive(false);
+  //   }, 10000);
+  // })();
+
+  // useEffect(() => {
+  //   clearTimeout(timer);
+  //   setActive(true);
+  // }, [transcript]);
+
+  // setInterval(function () {
+  //   console.log("Time left: " + time + "s");
+  // }, 1000);
 
   let voices;
 
@@ -207,7 +251,7 @@ const App = () => {
 
   const startListening = async () => {
     setListen(true);
-    await SpeechRecognition.startListening();
+    await SpeechRecognition.startListening({ continuous: true });
     await audioContext.resume();
   };
 
