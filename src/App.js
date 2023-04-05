@@ -43,7 +43,8 @@ const App = () => {
     "f*****": "fucker",
     "f******": "fucking",
     "s***": "shit",
-    "b******": "bullshit",
+    "b******": "bitches",
+    "b*******": "bullshit",
     "s*******": "shitting",
     "a*******": "asshole",
     "c***": "cunt",
@@ -212,8 +213,6 @@ const App = () => {
 
   let timer;
 
-  console.log("app");
-
   const [timeoutId, setTimeoutId] = useState(null);
 
   useEffect(() => {
@@ -226,7 +225,7 @@ const App = () => {
       setTimeout(() => {
         console.log("timeout active!");
         setActive(false);
-      }, 800)
+      }, 1000) // 800
     );
   }, [transcript]);
 
@@ -251,6 +250,7 @@ const App = () => {
 
   const startListening = async () => {
     setListen(true);
+    // clear timeout and start
     await SpeechRecognition.startListening({ continuous: true });
     await audioContext.resume();
   };
