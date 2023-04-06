@@ -11,6 +11,15 @@ const App = () => {
   // submit current transcript no matter if stopped
   // timing?
   // make profanity unfilter npm package
+  // listen better to not miss any words
+  //WebSocket connection to 'ws://localhost:3000/ws' failed: - use webkit instead of package?
+
+  // instructions:
+  // 1. Start this app. Input Api key and select voice.
+  // 2. Download VAC virtual audio cable. (Could also use something like VoiceMeeter.)
+  // 3. Change ouput from browser to virtual audio cable input.
+  // 4. Change whatever application you want to use voice in to use virual audio cable output as input.
+
   const { transcript, resetTranscript, listening } = useSpeechRecognition({
     continuous: true,
   });
@@ -145,10 +154,13 @@ const App = () => {
         (async () => {
           await getSpeech(text);
         })();
+        // getSpeech(text); // dont await response?
       }
 
       if (!listening) {
-        SpeechRecognition.startListening();
+        (async () => {
+          await SpeechRecognition.startListening({ continuous: true });
+        })();
       }
     } else {
       resetTranscript();
