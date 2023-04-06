@@ -3,40 +3,30 @@ import { useState, useEffect } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
-import { useVoice } from "./voice";
-import axios from "axios";
+import "./App.css";
 
 const App = () => {
-  // console.log("app");
+  // revert to webkit for better control over mic stop and start?
+  // change to force user to start and select?
+  // submit current transcript no matter if stopped
+  // timing?
   const { transcript, resetTranscript, listening } = useSpeechRecognition({
     continuous: true,
   });
 
-  // revert to webkit for better control over mic stop and start
-
-  const apiKey = "e7fd20d862337642310375d8d0fac1b6"; // add input
-  const voiceId = "xSV2LpK8ApxOXFOkWpft"; // get all and dropdown
-  // trump xSV2LpK8ApxOXFOkWpft
-  // angel Ii7yjallwe990yojM3L9
-  // const [voices, setVoices] = useState([]);
-  const url = "https://api.elevenlabs.io";
+  const [voices, setVoices] = useState([]);
+  const [voiceId, setVoiceId] = useState("");
+  const [button, setButton] = useState(null);
+  const [text, setText] = useState(null);
+  const [listen, setListen] = useState(false);
+  const [start, setStart] = useState(false);
   const [audioContext, setAudioContext] = useState(null);
+  const [active, setActive] = useState(true);
+  const [timeoutId, setTimeoutId] = useState(null);
+  const [apiKey, setApiKey] = useState("e7fd20d862337642310375d8d0fac1b6"); // change to empty for user input
 
-  useEffect(() => {
-    setAudioContext(new AudioContext());
-  }, []);
+  const url = "https://api.elevenlabs.io";
 
-  // const audioContext = new AudioContext(); //instantiate
-
-  // Create an empty audio buffer
-  // const audioBuffer1 = audioContext.createBuffer(2, 1, audioContext.sampleRate);
-
-  // Create an AudioBufferSourceNode to play the audio
-  // const audioSource = audioContext.createBufferSource();
-  // // audioSource.buffer = audioBuffer1;
-  // audioSource.connect(audioContext.destination);
-
-  // recognition.start();
   const profanityList = {
     "f***": "fuck",
     "f****": "fucks",
@@ -59,7 +49,7 @@ const App = () => {
     "b****": "bitch",
   };
 
-  function unfilter(text) {
+  const unfilter = (text) => {
     const words = text.split(" ");
     const filteredWords = words.map((word) => {
       if (word in profanityList) {
@@ -69,26 +59,7 @@ const App = () => {
       }
     });
     return filteredWords.join(" ");
-  }
-
-  // const unfilter = (text) => {
-  //   const array = text.split(" ");
-  //   array.forEach((word, index) => {
-  //     // expand
-  //     if (word.toLowerCase() === "f***") {
-  //       array[index] = "fuck";
-  //     }
-  //   });
-  //   return array.join(" ");
-  // };
-
-  useEffect(() => {
-    const get = async () => {
-      const voices = await getVoices();
-      console.log(voices);
-    };
-    get();
-  }, []);
+  };
 
   const getVoices = async () => {
     try {
@@ -100,7 +71,6 @@ const App = () => {
         },
       }).then((response) => response.json());
 
-      console.log(response);
       return response;
     } catch (e) {
       console.log(e);
@@ -124,19 +94,16 @@ const App = () => {
         }),
       });
 
-      console.log(response.body);
-
       const reader = response.body.getReader();
       console.log(reader);
 
       const audioChunks = [];
-      // let audioLength = 0;
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) {
           break;
         }
-        // audioLength += value.byteLength;
         audioChunks.push(value);
       }
 
@@ -149,71 +116,43 @@ const App = () => {
       audioSource.buffer = audioBuffer;
       audioSource.connect(audioContext.destination);
       audioSource.start();
-
-      // const reader = response.body.getReader();
-      // const audioChunks = [];
-
-      // while (true) {
-      //   const { done, value } = await reader.read();
-      //   if (done) {
-      //     break;
-      //   }
-      //   audioChunks.push(value);
-      //   console.log(value);
-      // }
-
-      // const audioBlob = new Blob(audioChunks);
-
-      // const audioBuffer = await audioContext.decodeAudioData(
-      //   await audioBlob.arrayBuffer()
-      // );
-
-      // const audioSource = audioContext.createBufferSource();
-      // audioSource.buffer = audioBuffer;
-      // audioSource.connect(audioContext.destination);
-      // audioSource.start(0);
-
-      // await reader.closed;
-      // console.log("audio stream ended");
-
       return;
     } catch (error) {
       console.log(error);
     }
   };
 
-  const [wordCount, setWordCount] = useState(0);
-  const [active, setActive] = useState(true);
+  const startListening = async () => {
+    setListen(true);
+    setStart(true);
+    // clear timeout and start
+    await SpeechRecognition.startListening({ continuous: true });
+    await audioContext.resume();
+  };
+
+  const stopListening = async () => {
+    setListen(false);
+    SpeechRecognition.stopListening();
+  };
 
   useEffect(() => {
-    if (listen) {
-      console.log(listening);
+    if (listen && !!voiceId) {
       if (!active && transcript) {
         const text = transcript;
-        // setWordCount(0);
         resetTranscript();
         console.log(`transcript: ${unfilter(transcript)}`);
-        const speechy = async (text) => {
-          const speech = await getSpeech(text);
-          console.log(speech);
-        };
-        speechy(text);
-        // SpeechRecognition.stopListening();
+        (async () => {
+          await getSpeech(text);
+        })();
       }
 
       if (!listening) {
         SpeechRecognition.startListening();
       }
+    } else {
+      resetTranscript();
     }
   }, [active]);
-
-  // useEffect(() => {
-  //   setWordCount(wordCount + 1);
-  // }, [transcript]);
-
-  let timer;
-
-  const [timeoutId, setTimeoutId] = useState(null);
 
   useEffect(() => {
     if (timeoutId) {
@@ -229,51 +168,80 @@ const App = () => {
     );
   }, [transcript]);
 
-  // (function timeout() {
-  //   timer = setTimeout(() => {
-  //     setActive(false);
-  //   }, 10000);
-  // })();
-
-  // useEffect(() => {
-  //   clearTimeout(timer);
-  //   setActive(true);
-  // }, [transcript]);
-
-  // setInterval(function () {
-  //   console.log("Time left: " + time + "s");
-  // }, 1000);
-
-  let voices;
-
-  const [listen, setListen] = useState(false);
-
-  const startListening = async () => {
-    setListen(true);
-    // clear timeout and start
-    await SpeechRecognition.startListening({ continuous: true });
-    await audioContext.resume();
-  };
-
-  const stopListening = async () => {
-    setListen(false);
-    SpeechRecognition.stopListening();
-  };
+  useEffect(() => {
+    setAudioContext(new AudioContext());
+    (async () => {
+      const allVoices = await getVoices();
+      setVoices(allVoices.voices);
+    })();
+  }, [apiKey]);
 
   return SpeechRecognition.browserSupportsSpeechRecognition() ? (
-    <div>
-      {voices?.forEach((voice) => {
-        return <h2>{voice}</h2>;
-      })}
-      <h1>mic is {listening ? "on" : "off"}</h1>
-      <button onClick={startListening}>Start</button>
-      <button onClick={stopListening}>Stop</button>
-      <button onClick={resetTranscript}>Reset</button>
-      {/* <button onClick={audioContext.resume}>Play</button> */}
-      <p>{unfilter(transcript)}</p>
+    <div className="main">
+      {!apiKey && (
+        <div>
+          <p>API Key: {}</p>
+          <form>
+            <input
+              type="text"
+              id="text"
+              name="text"
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              autoComplete="off"
+            />
+            <button
+              onClick={() => {
+                setApiKey(text);
+              }}
+            >
+              Submit
+            </button>
+          </form>
+        </div>
+      )}
+      {!start ? (
+        <h1>Press start to begin listening</h1>
+      ) : !!voiceId ? (
+        <h1>Voice changing: {listening ? "on" : "off"}</h1>
+      ) : (
+        <h1>Select voice</h1>
+      )}
+      <div>
+        <button onClick={startListening} className="button">
+          Start
+        </button>
+        <button onClick={stopListening} className="button">
+          Stop
+        </button>
+        <button onClick={resetTranscript} className="button">
+          Reset
+        </button>
+      </div>
+      <div>
+        <h2>Voices:</h2>
+        {voices?.map((voice, index) => {
+          return (
+            <button
+              key={index}
+              className={button === index ? "button-active" : "button"}
+              onClick={() => {
+                setButton(index);
+                setVoiceId(voice.voice_id);
+              }}
+            >
+              {voice.name}
+            </button>
+          );
+        })}
+      </div>
+      <h2>
+        Transcript: <div className="transcript">{unfilter(transcript)}</div>
+      </h2>
     </div>
   ) : (
     <div>not working my friend</div>
   );
 };
+
 export default React.memo(App);
