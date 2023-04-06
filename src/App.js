@@ -10,6 +10,7 @@ const App = () => {
   // change to force user to start and select?
   // submit current transcript no matter if stopped
   // timing?
+  // make profanity unfilter npm package
   const { transcript, resetTranscript, listening } = useSpeechRecognition({
     continuous: true,
   });
@@ -95,7 +96,7 @@ const App = () => {
       });
 
       const reader = response.body.getReader();
-      console.log(reader);
+      // console.log(reader);
 
       const audioChunks = [];
 
@@ -162,7 +163,7 @@ const App = () => {
 
     setTimeoutId(
       setTimeout(() => {
-        console.log("timeout active!");
+        // console.log("timeout active!"); // change
         setActive(false);
       }, 1000) // 800
     );
