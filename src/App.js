@@ -8,11 +8,11 @@ import "./App.css";
 const App = () => {
   // revert to webkit for better control over mic stop and start?
   // change to force user to start and select?
-  // submit current transcript no matter if stopped
+  // submit current transcript no matter if stopped **
   // timing?
   // make profanity unfilter npm package
   // listen better to not miss any words
-  //WebSocket connection to 'ws://localhost:3000/ws' failed: - use webkit instead of package?
+  // WebSocket connection to 'ws://localhost:3000/ws' failed: - use webkit instead of package?
 
   // instructions:
   // 1. Open command line and run: `npm i; npm run start` on Windows or `npm i && npm run start` on mac.
