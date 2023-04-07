@@ -273,16 +273,8 @@ const App = () => {
             <div>
               <h3>Instructions:</h3>
               <p>
-                {" "}
-                1. Open command line and run: <code>
-                  npm i; npm run start
-                </code>{" "}
-                on Windows or <code>npm i && npm run start</code> on mac.{" "}
-              </p>
-              <p>
-                {" "}
-                2. Input API key, press start, and select voice. Start speaking
-                to hear the converted audio.
+                Input API key, press start, and select voice. Start speaking to
+                hear the converted audio.
               </p>
 
               <h4>To output audio to another source on Windows:</h4>
@@ -376,7 +368,7 @@ const App = () => {
       )}
     </div>
   ) : (
-    <div>not working my friend</div>
+    <div>not working with your browser my friend</div>
   );
 };
 
