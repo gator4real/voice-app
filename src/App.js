@@ -22,6 +22,8 @@ const App = () => {
   const [timeoutId, setTimeoutId] = useState(null);
   const [status, setStatus] = useState(null);
   const [showInstructions, setShowInstructions] = useState(null);
+  const [apiKeyError, setApiKeyError] = useState(null);
+  const [validApiKey, setValidApiKey] = useState(null);
   const [apiKey, setApiKey] = useState(
     window.localStorage.getItem("elevenLabsApiKey")
   );
@@ -37,6 +39,13 @@ const App = () => {
           "xi-api-key": apiKey,
         },
       }).then((response) => response.json());
+
+      if (response.detail?.status === "invalid_api_key") {
+        setApiKey(null);
+        setApiKeyError(true);
+      } else {
+        setValidApiKey(true);
+      }
 
       return response;
     } catch (e) {
@@ -102,6 +111,7 @@ const App = () => {
     // fix
     stopListening();
     setApiKey(null);
+    setValidApiKey(null);
     setStatus(null);
     setVoiceId(null);
     setButton(null);
@@ -153,7 +163,7 @@ const App = () => {
 
   return SpeechRecognition.browserSupportsSpeechRecognition() ? (
     <div className="main">
-      {!apiKey ? (
+      {!validApiKey ? (
         <div>
           <Instructions
             showInstructions={showInstructions}
@@ -164,7 +174,7 @@ const App = () => {
           <a href="https://beta.elevenlabs.io/">website</a>, you can view your
           xi-api-key using the 'Profile' tab.
           <div>
-            <p>API Key:</p>
+            <p>API Key: </p>
             <form>
               <input
                 className="form-input"
@@ -185,6 +195,7 @@ const App = () => {
                 Submit
               </button>
             </form>
+            <div className="error">{apiKeyError && "Invalid API Key"}</div>
           </div>
         </div>
       ) : (
@@ -217,7 +228,7 @@ const App = () => {
               <p>
                 Input API key, press start, and select voice. Start speaking to
                 hear the converted audio. (If your mic can hear your speakers,
-                it will probably start looping audio.)
+                press stop when you're done talking to avoid looping.)
               </p>
 
               <h4>To output audio to another source on Windows:</h4>

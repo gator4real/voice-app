@@ -110,3 +110,8 @@ code {
   font-weight: bold;
   font-family: monospace;
 }
+
+.error {
+  color: red;
+  font-weight: bolder;
+}
