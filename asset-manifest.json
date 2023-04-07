@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/voice-app/static/css/main.1985faaa.css",
-    "main.js": "/voice-app/static/js/main.e1aeb78b.js",
+    "main.js": "/voice-app/static/js/main.36a81ca1.js",
     "static/js/787.c1112931.chunk.js": "/voice-app/static/js/787.c1112931.chunk.js",
     "index.html": "/voice-app/index.html",
     "main.1985faaa.css.map": "/voice-app/static/css/main.1985faaa.css.map",
-    "main.e1aeb78b.js.map": "/voice-app/static/js/main.e1aeb78b.js.map",
+    "main.36a81ca1.js.map": "/voice-app/static/js/main.36a81ca1.js.map",
     "787.c1112931.chunk.js.map": "/voice-app/static/js/787.c1112931.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.1985faaa.css",
-    "static/js/main.e1aeb78b.js"
+    "static/js/main.36a81ca1.js"
   ]
 }
