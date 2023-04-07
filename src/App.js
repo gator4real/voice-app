@@ -160,6 +160,9 @@ const App = () => {
             setShowInstructions={setShowInstructions}
           />
           <h1>Input your ElevenLabs API Key</h1>
+          To access your ElevenLabs API key, head to the official{" "}
+          <a href="https://beta.elevenlabs.io/">website</a>, you can view your
+          xi-api-key using the 'Profile' tab.
           <div>
             <p>API Key:</p>
             <form>
@@ -182,9 +185,6 @@ const App = () => {
                 Submit
               </button>
             </form>
-            To access your ElevenLabs API key, head to the official{" "}
-            <a href="https://beta.elevenlabs.io/">website</a>, you can view your
-            xi-api-key using the 'Profile' tab.
           </div>
         </div>
       ) : (
