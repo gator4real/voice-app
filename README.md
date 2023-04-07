@@ -1,8 +1,8 @@
-### Version 0.0.1
+### Version 0.0.0.0.0.1
 
 ### Notes:
 
-It's kinda buggy and cuts off your voice sometimes. The audio streams don't always sound good or human-like. There's also 2-3 seconds of latency from when you're done speaking until the audio returns which is pretty ass. Will improve further beyond version 0.0.1.
+It's kinda buggy and cuts off your voice sometimes. The audio streams don't always sound good or human-like. There's also 2-3 seconds of latency from when you're done speaking until the audio returns which is poopy. Will probably do more with this..
 
 ### Instructions:
 

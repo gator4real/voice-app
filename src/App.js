@@ -4,6 +4,8 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import "./App.css";
+import { Instructions } from "./instructions";
+import { unfilter } from "speech-enhancer";
 
 const App = () => {
   const { transcript, resetTranscript, listening } = useSpeechRecognition({
@@ -25,40 +27,6 @@ const App = () => {
   );
 
   const url = "https://api.elevenlabs.io";
-
-  const profanityList = {
-    "f***": "fuck",
-    "f****": "fucks",
-    "f*****": "fucker",
-    "f******": "fucking",
-    "s***": "shit",
-    "b******": "bitches",
-    "b*******": "bullshit",
-    "s*******": "shitting",
-    "a*******": "asshole",
-    "c***": "cunt",
-    "m*********": "motherfuck",
-    "m************": "motherfucking",
-    "m***********": "motherfucker",
-    "c***": "cock",
-    "c*********": "cocksucker",
-    "c**********": "cocksucking",
-    "d*********": "dicksucker",
-    "d**********": "dicksucking",
-    "b****": "bitch",
-  };
-
-  const unfilter = (text) => {
-    const words = text.split(" ");
-    const filteredWords = words.map((word) => {
-      if (word in profanityList) {
-        return profanityList[word];
-      } else {
-        return word;
-      }
-    });
-    return filteredWords.join(" ");
-  };
 
   const getVoices = async () => {
     try {
@@ -187,6 +155,10 @@ const App = () => {
     <div className="main">
       {!apiKey ? (
         <div>
+          <Instructions
+            showInstructions={showInstructions}
+            setShowInstructions={setShowInstructions}
+          />
           <h1>Input your ElevenLabs API Key</h1>
           <div>
             <p>API Key:</p>
@@ -250,8 +222,8 @@ const App = () => {
               <h4>To output audio to another source on Windows:</h4>
               <p>
                 {" "}
-                1. Download VAC virtual audio cable. (Could also use something
-                like VoiceMeeter.){" "}
+                1. Download VAC virtual audio cable. (Or use any software of
+                your choice.){" "}
               </p>
               <p>
                 {" "}
@@ -260,7 +232,7 @@ const App = () => {
               <p>
                 {" "}
                 3. Change whatever application you want to use voice in to use
-                virtual audio cable output as input.{" "}
+                virtual audio cable output, as input.{" "}
               </p>
               <button
                 onClick={() => {
