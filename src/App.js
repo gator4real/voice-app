@@ -38,6 +38,7 @@ const App = () => {
   const [active, setActive] = useState(true);
   const [timeoutId, setTimeoutId] = useState(null);
   const [status, setStatus] = useState(null);
+  const [showInstructions, setShowInstructions] = useState(null);
   const [apiKey, setApiKey] = useState(
     window.localStorage.getItem("elevenLabsApiKey")
   );
@@ -250,6 +251,16 @@ const App = () => {
             <button
               className="top-button"
               onClick={() => {
+                showInstructions
+                  ? setShowInstructions(false)
+                  : setShowInstructions(true);
+              }}
+            >
+              Instructions
+            </button>
+            <button
+              className="top-button"
+              onClick={() => {
                 reset();
                 window.localStorage.removeItem("elevenLabsApiKey");
               }}
@@ -257,62 +268,108 @@ const App = () => {
               Reset API Key
             </button>
           </div>
-          {!start ? (
-            <h1>Press start to begin listening</h1>
-          ) : !!voiceId ? (
-            <h1>Voice changing: {listening ? "on" : "off"}</h1>
-          ) : (
-            <h1>Select voice</h1>
-          )}
-          <div>
-            <button
-              onClick={() => {
-                startListening();
-                setStatus(true);
-              }}
-              className={!!status ? "button-active" : "button"}
-            >
-              Start
-            </button>
-            <button
-              onClick={() => {
-                stopListening();
-                setStatus(false);
-              }}
-              className={status === false ? "button-active" : "button"}
-            >
-              Stop
-            </button>
-            <button onClick={resetTranscript} className="button">
-              Reset
-            </button>
-          </div>
-          {start && (
-            <div>
-              <div className="voice-container">
-                <h2>Voices:</h2>
-                {voices?.map((voice, index) => {
-                  return (
-                    <button
-                      key={index}
-                      className={button === index ? "button-active" : "button"}
-                      onClick={() => {
-                        setButton(index);
-                        setVoiceId(voice.voice_id);
-                      }}
-                    >
-                      {voice.name}
-                    </button>
-                  );
-                })}
-              </div>
 
-              <h2>
-                Transcript:
-                <div className="transcript">
-                  {!!voiceId && unfilter(transcript)}
+          {showInstructions ? (
+            <div>
+              <h3>Instructions:</h3>
+              <p>
+                {" "}
+                1. Open command line and run: <code>
+                  npm i; npm run start
+                </code>{" "}
+                on Windows or <code>npm i && npm run start</code> on mac.{" "}
+              </p>
+              <p>
+                {" "}
+                2. Input API key, press start, and select voice. Start speaking
+                to hear the converted audio.
+              </p>
+
+              <h4>To output audio to another source on Windows:</h4>
+              <p>
+                {" "}
+                1. Download VAC virtual audio cable. (Could also use something
+                like VoiceMeeter.){" "}
+              </p>
+              <p>
+                {" "}
+                {`2. Change ouput from browser to virtual audio cable input. (Start > Settings > System > Sound (under Advanced Sound Options) App volume and device preferences > Select top of two options and change to virtual input.)`}{" "}
+              </p>
+              <p>
+                {" "}
+                3. Change whatever application you want to use voice in to use
+                virtual audio cable output as input.{" "}
+              </p>
+              <button
+                onClick={() => {
+                  setShowInstructions(false);
+                }}
+              >
+                Return
+              </button>
+            </div>
+          ) : (
+            <div>
+              {!start ? (
+                <h1>Press start to begin listening</h1>
+              ) : !!voiceId ? (
+                <h1>Voice changing: {listening ? "on" : "off"}</h1>
+              ) : (
+                <h1>Select voice</h1>
+              )}
+              <div>
+                <button
+                  onClick={() => {
+                    startListening();
+                    setStatus(true);
+                  }}
+                  className={!!status ? "button-active" : "button"}
+                >
+                  Start
+                </button>
+                <button
+                  onClick={() => {
+                    stopListening();
+                    setStatus(false);
+                  }}
+                  className={status === false ? "button-active" : "button"}
+                >
+                  Stop
+                </button>
+                <button onClick={resetTranscript} className="button">
+                  Reset
+                </button>
+              </div>
+              {start && (
+                <div>
+                  <div className="voice-container">
+                    <h2>Voices:</h2>
+                    {voices?.map((voice, index) => {
+                      return (
+                        <button
+                          key={index}
+                          className={
+                            button === index ? "button-active" : "button"
+                          }
+                          onClick={() => {
+                            setButton(index);
+                            setVoiceId(voice.voice_id);
+                          }}
+                        >
+                          {voice.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <h2>
+                    Transcript:
+                    <div className="transcript">
+                      {!!voiceId && unfilter(transcript)}
+                    </div>
+                  </h2>
                 </div>
-              </h2>
+              )}
             </div>
           )}
         </div>
