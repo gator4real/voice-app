@@ -23,12 +23,35 @@ const App = () => {
   const [status, setStatus] = useState(null);
   const [showInstructions, setShowInstructions] = useState(null);
   const [apiKeyError, setApiKeyError] = useState(null);
-  const [validApiKey, setValidApiKey] = useState(null);
+  const [errorCount, setErrorCount] = useState(0.5);
   const [apiKey, setApiKey] = useState(
     window.localStorage.getItem("elevenLabsApiKey")
   );
 
   const url = "https://api.elevenlabs.io";
+
+  const checkUser = async (apiKey) => {
+    try {
+      const response = await fetch(`${url}/v1/user`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "xi-api-key": apiKey,
+        },
+      }).then((response) => response.json());
+
+      if (response.detail?.status === "invalid_api_key") {
+        setErrorCount(errorCount + 1);
+        setApiKeyError(true);
+      } else {
+        setApiKeyError(false);
+        window.localStorage.setItem("elevenLabsApiKey", apiKey);
+        setApiKey(apiKey);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const getVoices = async () => {
     try {
@@ -39,13 +62,6 @@ const App = () => {
           "xi-api-key": apiKey,
         },
       }).then((response) => response.json());
-
-      if (response.detail?.status === "invalid_api_key") {
-        setApiKey(null);
-        setApiKeyError(true);
-      } else {
-        setValidApiKey(true);
-      }
 
       return response;
     } catch (e) {
@@ -111,7 +127,6 @@ const App = () => {
     // fix
     stopListening();
     setApiKey(null);
-    setValidApiKey(null);
     setStatus(null);
     setVoiceId(null);
     setButton(null);
@@ -163,7 +178,7 @@ const App = () => {
 
   return SpeechRecognition.browserSupportsSpeechRecognition() ? (
     <div className="main">
-      {!validApiKey ? (
+      {!apiKey ? (
         <div>
           <Instructions
             showInstructions={showInstructions}
@@ -175,7 +190,7 @@ const App = () => {
           xi-api-key using the 'Profile' tab.
           <div>
             <p>API Key: </p>
-            <form>
+            <form onSubmit={(e) => e.preventDefault()}>
               <input
                 className="form-input"
                 type="text"
@@ -187,15 +202,19 @@ const App = () => {
               />
               <button
                 className="button-small"
-                onClick={() => {
-                  setApiKey(text);
-                  window.localStorage.setItem("elevenLabsApiKey", text);
+                onClick={async () => {
+                  await checkUser(text);
                 }}
               >
                 Submit
               </button>
             </form>
-            <div className="error">{apiKeyError && "Invalid API Key"}</div>
+            <div
+              className="error"
+              style={{ fontSize: `calc(10px * ${errorCount})` }}
+            >
+              {apiKeyError && "Invalid API Key"}
+            </div>
           </div>
         </div>
       ) : (
