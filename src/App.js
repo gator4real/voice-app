@@ -6,24 +6,6 @@ import SpeechRecognition, {
 import "./App.css";
 
 const App = () => {
-  // revert to webkit for better control over mic stop and start?
-  // change to force user to start and select?
-  // submit current transcript no matter if stopped **
-  // timing?
-  // make profanity unfilter npm package
-  // listen better to not miss any words
-  // WebSocket connection to 'ws://localhost:3000/ws' failed: - use webkit instead of package?
-  // eleven labs api package?
-
-  // instructions:
-  // 1. Open command line and run: `npm i; npm run start` on Windows or `npm i && npm run start` on mac.
-  // 2. Input Api key, press start, and select voice. Start speaking to hear the converted audio.
-
-  // To output audio to another source on Windows:
-  // 1. Download VAC virtual audio cable. (Could also use something like VoiceMeeter.)
-  // 2. Change ouput from browser to virtual audio cable input. (Start > Settings > System > Sound (under Advanced Sound Options) App volume and device preferences > Select top of two options and change to virtual input.)
-  // 3. Change whatever application you want to use voice in to use virtual audio cable output as input.
-
   const { transcript, resetTranscript, listening } = useSpeechRecognition({
     continuous: true,
   });
@@ -32,7 +14,6 @@ const App = () => {
   const [voiceId, setVoiceId] = useState("");
   const [button, setButton] = useState(null);
   const [text, setText] = useState("");
-  // const [listen, setListen] = useState(false);
   const [start, setStart] = useState(false);
   const [audioContext, setAudioContext] = useState(null);
   const [active, setActive] = useState(true);
@@ -42,7 +23,6 @@ const App = () => {
   const [apiKey, setApiKey] = useState(
     window.localStorage.getItem("elevenLabsApiKey")
   );
-  // e7fd20d862337642310375d8d0fac1b6 my key
 
   const url = "https://api.elevenlabs.io";
 
@@ -114,7 +94,6 @@ const App = () => {
       });
 
       const reader = response.body.getReader();
-      // console.log(reader);
 
       const audioChunks = [];
 
@@ -142,15 +121,12 @@ const App = () => {
   };
 
   const startListening = async () => {
-    // setListen(true);
     setStart(true);
-    // clear timeout and start
     await SpeechRecognition.startListening({ continuous: true });
     await audioContext.resume();
   };
 
   const stopListening = () => {
-    // setListen(false);
     SpeechRecognition.stopListening();
   };
 
@@ -175,14 +151,7 @@ const App = () => {
         (async () => {
           await getSpeech(text);
         })();
-        // getSpeech(text); // dont await response?
       }
-
-      // if (!listening) {
-      //   (async () => {
-      //     await SpeechRecognition.startListening({ continuous: true });
-      //   })();
-      // }
     } else {
       resetTranscript();
     }
@@ -196,7 +165,6 @@ const App = () => {
 
     setTimeoutId(
       setTimeout(() => {
-        // console.log("timeout active!"); // change
         setActive(false);
       }, 1000) // 800
     );
