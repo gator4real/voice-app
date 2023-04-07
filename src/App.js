@@ -13,6 +13,7 @@ const App = () => {
   // make profanity unfilter npm package
   // listen better to not miss any words
   // WebSocket connection to 'ws://localhost:3000/ws' failed: - use webkit instead of package?
+  // eleven labs api package?
 
   // instructions:
   // 1. Open command line and run: `npm i; npm run start` on Windows or `npm i && npm run start` on mac.
@@ -30,13 +31,17 @@ const App = () => {
   const [voices, setVoices] = useState([]);
   const [voiceId, setVoiceId] = useState("");
   const [button, setButton] = useState(null);
-  const [text, setText] = useState(null);
-  const [listen, setListen] = useState(false);
+  const [text, setText] = useState("");
+  // const [listen, setListen] = useState(false);
   const [start, setStart] = useState(false);
   const [audioContext, setAudioContext] = useState(null);
   const [active, setActive] = useState(true);
   const [timeoutId, setTimeoutId] = useState(null);
-  const [apiKey, setApiKey] = useState("e7fd20d862337642310375d8d0fac1b6"); // change to empty for user input
+  const [status, setStatus] = useState(null);
+  const [apiKey, setApiKey] = useState(
+    window.localStorage.getItem("elevenLabsApiKey")
+  );
+  // e7fd20d862337642310375d8d0fac1b6 my key
 
   const url = "https://api.elevenlabs.io";
 
@@ -136,20 +141,32 @@ const App = () => {
   };
 
   const startListening = async () => {
-    setListen(true);
+    // setListen(true);
     setStart(true);
     // clear timeout and start
     await SpeechRecognition.startListening({ continuous: true });
     await audioContext.resume();
   };
 
-  const stopListening = async () => {
-    setListen(false);
+  const stopListening = () => {
+    // setListen(false);
     SpeechRecognition.stopListening();
   };
 
+  const reset = () => {
+    // fix
+    stopListening();
+    setApiKey(null);
+    setStatus(null);
+    setVoiceId(null);
+    setButton(null);
+    setStart(false);
+    setVoices([]);
+    setText("");
+  };
+
   useEffect(() => {
-    if (listen && !!voiceId) {
+    if (!!voiceId) {
       if (!active && transcript) {
         const text = transcript;
         resetTranscript();
@@ -160,11 +177,11 @@ const App = () => {
         // getSpeech(text); // dont await response?
       }
 
-      if (!listening) {
-        (async () => {
-          await SpeechRecognition.startListening({ continuous: true });
-        })();
-      }
+      // if (!listening) {
+      //   (async () => {
+      //     await SpeechRecognition.startListening({ continuous: true });
+      //   })();
+      // }
     } else {
       resetTranscript();
     }
@@ -186,74 +203,120 @@ const App = () => {
 
   useEffect(() => {
     setAudioContext(new AudioContext());
-    (async () => {
-      const allVoices = await getVoices();
-      setVoices(allVoices.voices);
-    })();
+    setStatus(null);
+    if (apiKey) {
+      (async () => {
+        const allVoices = await getVoices();
+        setVoices(allVoices.voices);
+      })();
+    }
   }, [apiKey]);
 
   return SpeechRecognition.browserSupportsSpeechRecognition() ? (
     <div className="main">
-      {!apiKey && (
+      {!apiKey ? (
         <div>
-          <p>API Key: {}</p>
-          <form>
-            <input
-              type="text"
-              id="text"
-              name="text"
-              value={text}
-              onChange={(event) => setText(event.target.value)}
-              autoComplete="off"
-            />
+          <h1>Input your ElevenLabs API Key</h1>
+          <div>
+            <p>API Key:</p>
+            <form>
+              <input
+                className="form-input"
+                type="text"
+                id="text"
+                name="text"
+                value={text}
+                onChange={(event) => setText(event.target.value)}
+                autoComplete="off"
+              />
+              <button
+                className="button-small"
+                onClick={() => {
+                  setApiKey(text);
+                  window.localStorage.setItem("elevenLabsApiKey", text);
+                }}
+              >
+                Submit
+              </button>
+            </form>
+            To access your ElevenLabs API key, head to the official{" "}
+            <a href="https://beta.elevenlabs.io/">website</a>, you can view your
+            xi-api-key using the 'Profile' tab.
+          </div>
+        </div>
+      ) : (
+        <div>
+          <div className="button-container">
             <button
+              className="top-button"
               onClick={() => {
-                setApiKey(text);
+                reset();
+                window.localStorage.removeItem("elevenLabsApiKey");
               }}
             >
-              Submit
+              Reset API Key
             </button>
-          </form>
+          </div>
+          {!start ? (
+            <h1>Press start to begin listening</h1>
+          ) : !!voiceId ? (
+            <h1>Voice changing: {listening ? "on" : "off"}</h1>
+          ) : (
+            <h1>Select voice</h1>
+          )}
+          <div>
+            <button
+              onClick={() => {
+                startListening();
+                setStatus(true);
+              }}
+              className={!!status ? "button-active" : "button"}
+            >
+              Start
+            </button>
+            <button
+              onClick={() => {
+                stopListening();
+                setStatus(false);
+              }}
+              className={status === false ? "button-active" : "button"}
+            >
+              Stop
+            </button>
+            <button onClick={resetTranscript} className="button">
+              Reset
+            </button>
+          </div>
+          {start && (
+            <div>
+              <div className="voice-container">
+                <h2>Voices:</h2>
+                {voices?.map((voice, index) => {
+                  return (
+                    <button
+                      key={index}
+                      className={button === index ? "button-active" : "button"}
+                      onClick={() => {
+                        setButton(index);
+                        setVoiceId(voice.voice_id);
+                      }}
+                    >
+                      {voice.name}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <h2>
+                Transcript:
+                <div className="transcript">
+                  {!!voiceId && unfilter(transcript)}
+                </div>
+              </h2>
+            </div>
+          )}
         </div>
       )}
-      {!start ? (
-        <h1>Press start to begin listening</h1>
-      ) : !!voiceId ? (
-        <h1>Voice changing: {listening ? "on" : "off"}</h1>
-      ) : (
-        <h1>Select voice</h1>
-      )}
-      <div>
-        <button onClick={startListening} className="button">
-          Start
-        </button>
-        <button onClick={stopListening} className="button">
-          Stop
-        </button>
-        <button onClick={resetTranscript} className="button">
-          Reset
-        </button>
-      </div>
-      <div>
-        <h2>Voices:</h2>
-        {voices?.map((voice, index) => {
-          return (
-            <button
-              key={index}
-              className={button === index ? "button-active" : "button"}
-              onClick={() => {
-                setButton(index);
-                setVoiceId(voice.voice_id);
-              }}
-            >
-              {voice.name}
-            </button>
-          );
-        })}
-      </div>
-      <h2>
-        Transcript: <div className="transcript">{unfilter(transcript)}</div>
-      </h2>
     </div>
   ) : (
     <div>not working my friend</div>

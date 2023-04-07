@@ -39,7 +39,7 @@
 
 .main {
   padding: 0px 30px;
-  background-color: #282c34;
+  background-color: #0d1117;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -55,7 +55,8 @@
 
 .button,
 .button-active,
-.button-middle {
+.button-middle,
+.button-small {
   margin: 5px 10px;
   background: lightskyblue;
   font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
@@ -68,14 +69,32 @@
   color: #282c34;
 }
 
+.button-small {
+  margin: 0 5px;
+  width: auto;
+}
+
+.top-button {
+  margin: 10px 0;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.voice-container {
+  max-width: 800px;
+}
+
 .button-active,
 .button:active {
   background: lightgreen;
-}
-
-.button-middle {
-  /* align-self: center; */
-  width: 100%;
 }
 
 .transcript {

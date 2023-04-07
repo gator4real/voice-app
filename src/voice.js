@@ -8,7 +8,6 @@
 //         continuous: true
 //       });
 
-
 //     const [isListening, setIsListening] = useState(false);
 //     const listen = () => {
 //       setIsListening(!isListening);
