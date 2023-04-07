@@ -171,7 +171,9 @@ const App = () => {
   }, [transcript]);
 
   useEffect(() => {
-    setAudioContext(new AudioContext());
+    if (SpeechRecognition.browserSupportsSpeechRecognition()) {
+      setAudioContext(new AudioContext());
+    }
     setStatus(null);
     if (apiKey) {
       (async () => {
