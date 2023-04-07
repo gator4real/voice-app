@@ -19,7 +19,8 @@ export const Instructions = (props) => {
           <h3>Instructions:</h3>
           <p>
             Input API key, press start, and select voice. Start speaking to hear
-            the converted audio.
+            the converted audio. (If your mic can hear your speakers, it will
+            probably start looping audio.)
           </p>
 
           <h4>To output audio to another source on Windows:</h4>
