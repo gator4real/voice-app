@@ -193,9 +193,6 @@ const App = () => {
             <form onSubmit={(e) => e.preventDefault()}>
               <input
                 className="form-input"
-                type="text"
-                id="text"
-                name="text"
                 value={text}
                 onChange={(event) => setText(event.target.value)}
                 autoComplete="off"
