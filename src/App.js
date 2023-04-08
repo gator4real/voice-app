@@ -5,7 +5,7 @@ import SpeechRecognition, {
 } from "react-speech-recognition";
 import "./App.css";
 import { Instructions } from "./instructions";
-import { unfilter } from "speech-enhancer";
+import { enhance } from "speech-enhancer";
 
 const App = () => {
   const { transcript, resetTranscript, listening } = useSpeechRecognition({
@@ -78,7 +78,7 @@ const App = () => {
           "xi-api-key": apiKey,
         },
         body: JSON.stringify({
-          text: unfilter(text),
+          text: enhance(text),
           voice_settings: {
             stability: 0,
             similarity_boost: 0,
@@ -140,7 +140,7 @@ const App = () => {
       if (!active && transcript) {
         const text = transcript;
         resetTranscript();
-        console.log(`transcript: ${unfilter(transcript)}`);
+        console.log(`transcript: ${enhance(transcript)}`);
         (async () => {
           await getSpeech(text);
         })();
@@ -330,7 +330,7 @@ const App = () => {
                   <h2>
                     Transcript:
                     <div className="transcript">
-                      {!!voiceId && unfilter(transcript)}
+                      {!!voiceId && enhance(transcript)}
                     </div>
                   </h2>
                 </div>
