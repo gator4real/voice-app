@@ -53,6 +53,11 @@
   height: 100vh;
 }
 
+/* .voice-container {
+  display: flex;
+  flex-wrap: wrap;
+} */
+
 .button,
 .button-active,
 .button-middle,
@@ -65,7 +70,7 @@
   border: none;
   border-radius: 2px;
   padding: 5px;
-  width: 100px;
+  min-width: 100px;
   color: #282c34;
 }
 

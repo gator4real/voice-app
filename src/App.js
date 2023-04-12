@@ -304,8 +304,8 @@ const App = () => {
               </div>
               {start && (
                 <div>
+                  <h2>Voices:</h2>
                   <div className="voice-container">
-                    <h2>Voices:</h2>
                     {voices?.map((voice, index) => {
                       return (
                         <button
@@ -323,7 +323,6 @@ const App = () => {
                       );
                     })}
                   </div>
-
                   <h2>
                     Transcript:
                     <div className="transcript">
